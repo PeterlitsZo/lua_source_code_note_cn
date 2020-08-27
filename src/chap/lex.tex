@@ -17,7 +17,7 @@
 
 我们可以看到如代码\ref{lua.c::main}所示一样，
 
-\begin{ccode}{lua.c::main}{\cmd{lua.c}中的\cmd{main}函数}
+\begin{ccode}[label=lua.c::main, caption=\cmd{lua.c}中的\cmd{main}函数]
 int main (int argc, char **argv) {
   int status, result;
   lua_State *L = luaL_newstate();  /* create state */
@@ -36,7 +36,7 @@ int main (int argc, char **argv) {
 }
 \end{ccode}
 
-我们首先创建了一个\cmd{lua_state*}对象来存储\cmd{VM}\footnote{\cmd{VM}，可以说是
+我们首先创建了一个\cmd{lua\_state*}对象来存储\cmd{VM}\footnote{\cmd{VM}，可以说是
 程序虚拟机的意思。}的状态。
 
 之后我们将临时函数（这里是\cmd{pmain}）和命令行变量入栈调用，最后退出。
