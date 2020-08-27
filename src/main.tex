@@ -26,8 +26,8 @@
 \newcommand{\cmd}[1]{\,{\tt #1}\,}
 
 % use verbatim to input the code
-\lstnewenvironment{ccode}{\lstset{language=C}}{}
-\lstnewenvironment{luacode}{\lstset{language=lua}}{}
+\lstnewenvironment{ccode}[2]{\lstset{language=C, caption={[#2]#2}, label={#1}}}{}
+\lstnewenvironment{luacode}[2]{\lstset{language=lua, caption{[#2]#2}, label={#1}}}{}
 
 
 % the main part
