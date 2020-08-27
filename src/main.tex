@@ -1,9 +1,11 @@
-\documentclass{ctexbook}
+\documentclass[10pt, b5paper]{ctexbook}
 
 
 % Third-part package
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{listings}
+\usepackage[right=1.8cm, left=2.2cm, top=2.4cm, bottom=2.4cm]{geometry}
+\usepackage{xcolor}
 
 
 % The base settings
@@ -11,11 +13,17 @@
 
 % for listings
 \lstset{
-    basicstyle=\ttfamily\fontsize{8.5pt}{8pt}\selectfont,
+    basicstyle=\ttfamily\fontsize{7.2pt}{7.2pt}\selectfont,
     breaklines,
     frame=tRBl,
     xleftmargin=2.5em,
+
+    commentstyle=\color{black!50!white},
+    emphstyle=\bfseries,
+    stringstyle=\color{black!75!white},
 }
+
+\setmonofont{inconsolata}
 
 
 % Command for the note
