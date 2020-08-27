@@ -1,0 +1,46 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Lex 分词}
+
+运行一个解释器编程语言，我们一般会使用\cmd{lex}来对程序进行分词，而使用\cmd{yyac}%
+来对标记流（\cmd{lex}分完词之后的结果）生成抽象语法树。
+
+在分析之前，我们先在\cmd{lua.c}中根据\cmd{main}函数来看看它如何解析命令行参数。
+
+\section{命令行解析}
+
+我们在了解如何分词之前我们需要了解它到底在什么时候开始分词的。在一开始我们跟着
+调用顺序从\cmd{main}入手，随后是\cmd{pmain}。
+
+\subsection{\cmd{main}入口}
+
+我们可以看到如代码\ref{lua.c::main}所示一样，
+
+\begin{ccode}{lua.c::main}{\cmd{lua.c}中的\cmd{main}函数}
+int main (int argc, char **argv) {
+  int status, result;
+  lua_State *L = luaL_newstate();  /* create state */
+  if (L == NULL) {
+    l_message(argv[0], "cannot create state: not enough memory");
+    return EXIT_FAILURE;
+  }
+  lua_pushcfunction(L, &pmain);  /* to call 'pmain' in protected mode */
+  lua_pushinteger(L, argc);  /* 1st argument */
+  lua_pushlightuserdata(L, argv); /* 2nd argument */
+  status = lua_pcall(L, 2, 1, 0);  /* do the call */
+  result = lua_toboolean(L, -1);  /* get result */
+  report(L, status);
+  lua_close(L);
+  return (result && status == LUA_OK) ? EXIT_SUCCESS : EXIT_FAILURE;
+}
+\end{ccode}
+
+我们首先创建了一个\cmd{lua_state*}对象来存储\cmd{VM}\footnote{\cmd{VM}，可以说是
+程序虚拟机的意思。}的状态。
+
+之后我们将临时函数（这里是\cmd{pmain}）和命令行变量入栈调用，最后退出。
+
+\subsection{\cmd{pmain}函数}
+
+
