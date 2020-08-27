@@ -1,0 +1,35 @@
+\documentclass{ctexbook}
+
+
+% Third-part package
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{listings}
+
+
+% Command for the note
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% use cmd command to input the command, I do not like to use verb in `inline`
+% mode.
+\newcommand{\cmd}[1]{\,{\tt #1}\,}
+
+% use verbatim to input the code
+\lstnewvironment{ccode}
+    [2]
+    [float, label=#1, caption=#2]
+    {\lstset{luaguage=C}}
+    {}
+\lstnewvironment{luacode}
+    [2]
+    [float, label=#1, caption=#2]
+    {\lstset{luaguage=lua}}
+    {}
+
+
+% the main part
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+    \input{./chap/lex.tex}
+\end{document}
+
