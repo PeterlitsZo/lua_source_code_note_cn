@@ -6,6 +6,18 @@
 \usepackage{listings}
 
 
+% The base settings
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% for listings
+\lstset{
+    basicstyle=\ttfamily\fontsize{8.5pt}{8pt}\selectfont,
+    breaklines,
+    frame=tRBl,
+    xleftmargin=2.5em,
+}
+
+
 % Command for the note
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -14,22 +26,14 @@
 \newcommand{\cmd}[1]{\,{\tt #1}\,}
 
 % use verbatim to input the code
-\lstnewvironment{ccode}
-    [2]
-    [float, label=#1, caption=#2]
-    {\lstset{luaguage=C}}
-    {}
-\lstnewvironment{luacode}
-    [2]
-    [float, label=#1, caption=#2]
-    {\lstset{luaguage=lua}}
-    {}
+\lstnewenvironment{ccode}{\lstset{language=C}}{}
+\lstnewenvironment{luacode}{\lstset{language=lua}}{}
 
 
 % the main part
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
-    \input{./chap/lex.tex}
+    \input{src/chap/lex.tex}
 \end{document}
 
