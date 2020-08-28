@@ -8,6 +8,7 @@
 
 在分析之前，我们先在\cmd{lua.c}中根据\cmd{main}函数来看看它如何解析命令行参数。
 
+
 \section{命令行解析}
 
 我们在了解如何分词之前我们需要了解它到底在什么时候开始分词的。在一开始我们跟着
@@ -25,6 +26,7 @@ main
  |           +- 使用 docall 来进行运行。
  +- 结束状态机运行
 \end{code}
+
 
 \subsection{\cmd{main}入口}
 
@@ -56,6 +58,7 @@ int main (int argc, char **argv) {
 {1}，然后使用\cmd{pmain}对齐调用），最后退出。
 
 我们接下来看看类型为\cmd{cfunction}的函数指针的调用顺序。
+
 
 \subsection{\cmd{pmain}函数}
 
@@ -126,6 +129,9 @@ static int pmain (lua_State *L) {
   }
 \end{ccode}
 
+接下来是下一个部分，即\cmd{REPL}中最重要的部分。
+
+
 \subsection{\cmd{doREPL}函数}
 
 我们看到代码\ref{lua.c::doREPL}，它就和注释一样：读取，求值，输出，循环。我们注
@@ -156,9 +162,15 @@ static void doREPL (lua_State *L) {
 }
 \end{ccode}
 
-\subsection{\cmd{loadline}函数}
+接下来我们会寻找在交互式中，\cmd{lua}如何将输入转换为\cmd{lua}本身能够运行的语法
+结构，即\cmd{loadline}函数。
+
+
+\subsection{\cmd{loadline}函数和进入解析的入口\cmd{pushline}}
 
 如代码\ref{lua.c::loadline}所示，我们首先会使用\cmd{pushline}来输入解析。
+
+[TODO]: 此处代码有误。
 
 \begin{ccode}{lua.c::loadline}{\cmd{lua.c}中的\cmd{loadline}函数}
 /*
@@ -179,4 +191,32 @@ static int loadline (lua_state *l) {
   return status;
 }
 \end{ccode}
+
+而\cmd{pushline}，如代码\ref{lua.c::pushline}所示，我们
+
+\begin{ccode}{lua.c::pushline}{\cmd{lua.c}中\cmd{REPL}的IO动作与语法解析}
+/*
+** Prompt the user, read a line, and push it into the Lua stack.
+*/
+static int pushline (lua_State *L, int firstline) {
+  char buffer[LUA_MAXINPUT];
+  char *b = buffer;
+  size_t l;
+  const char *prmt = get_prompt(L, firstline);
+  int readstatus = lua_readline(L, b, prmt);
+  if (readstatus == 0)
+    return 0;  /* no input (prompt will be popped by caller) */
+  lua_pop(L, 1);  /* remove prompt */
+  l = strlen(b);
+  if (l > 0 && b[l-1] == '\n')  /* line ends with newline? */
+    b[--l] = '\0';  /* remove it */
+  if (firstline && b[0] == '=')  /* for compatibility with 5.2, ... */
+    lua_pushfstring(L, "return %s", b + 1);  /* change '=' to 'return' */
+  else
+    lua_pushlstring(L, b, l);
+  lua_freeline(L, b);
+  return 1;
+}
+\end{ccode}
+
 
