@@ -1,12 +1,12 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{序}
+\chapter*{序}
 
 这是一本关于\cmd{lua}如何实现的文章。本书的源代码可以访问托管在\cmd{github}上的
 仓库，即\cmd{github.com/PeterlitsZo/lua\_source\_code\_note\_cn}。
 
-\section{本书读者}
+\subsection*{本书读者}
 
 我们希望读者有着较强的\cmd{C}语言使用经验，对基本的计算机术语有着基础的认识（\emph{%
 如：状态机，面向对象等}）。如果不熟悉的话，推荐阅读《C和指针》或者《The C Programming
@@ -19,12 +19,14 @@ Language》。
 
 我们希望读者使用过UNIX shell的经历。
 
-\section{为什么是\cmd{lua}}
+
+\subsection*{为什么是\cmd{lua}}
 
 \cmd{lua}是一个简洁、轻量、对\cmd{C}友好的脚本语言。它的实现非常优雅，是一个有着
 属于它独特魅力的语言。
 
-\section{\cmd{lua}版本}
+
+\subsection*{\cmd{lua}版本}
 
 本书采用的\cmd{lua}是正在开发中的版本，你可以在\cmd{github.com}中运行命令进行克隆：
 \begin{code}{about[clone-lua]}{在\cmd{github.com}克隆到本地}
@@ -33,6 +35,8 @@ $ cd ~/lua
 $ git reset --hard 6bc0f135
 \end{code}
 
+\def\useless$
+
 运行了相关的shell代码\ref{about[clone-lua]}，我们可以说你现在看到的\cmd{lua}代码
 和编写本书时看到的\cmd{lua}代码基本一致。
 
@@ -40,8 +44,28 @@ $ git reset --hard 6bc0f135
 \cmd{lua}是如何实现的}），我们关注的重点更是如何从零开始打造一个图灵完备的编程语言。
 这也是我们为什么不强求\cmd{lua}的实现版本，我们关注的是一个语言如何从零实现的。
 
-\section{致谢}
+
+\subsection*{本书构架}
+
+在第一章，我们探寻\cmd{lex}框架：它将字符串转换为有意义的字符串流（token stream），
+在此之前我们还会以极快的速度从\cmd{main}函数通过\cmd{REPL}途径走到\cmd{lex}中。
+
+在第二章，我们会探寻它的如何从\cmd{lex}产生的字符串流转换为抽象树。
+
+在第三章，我们会探索\cmd{lua}的一些数据结构的表达方式。
+
+
+\subsection*{勘误}
+
+如果有任何错误的话，请访问\cmd{github.com/PeterlitsZo/lua\_source\_code\_note\_cn}，
+提交\cmd{issue}或者申请\cmd{Pull request}即可。
+
+也欢迎加入来完善本书。
+
+
+\subsection*{致谢}
 
 本书有很多部分都是基于源代码、维基百科和\cmd{lua}的官方网站\footnote{见：\cmd{lua.prg}%
-。}，在这里对开源组织表示感谢。
+。}，在这里对开源组织表示感谢，如果这本书产生收益的话，其中一半会支付给\cmd{lua}组织以
+支撑它们接下来的运行。
 
