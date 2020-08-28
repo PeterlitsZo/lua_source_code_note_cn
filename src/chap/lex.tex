@@ -115,7 +115,11 @@ static int pmain (lua_State *L) {
 
 \subsection{\cmd{doREPL}函数}
 
-我们看到代码\ref{lua.c::doREPL}，它就和注释一样：读取，求值，输出，循环。
+我们看到代码\ref{lua.c::doREPL}，它就和注释一样：读取，求值，输出，循环。我们注
+意到，在循环的过程中，最主要的是我们使用的函数\cmd{loadline}和\cmd{docall}。
+
+因为我们只关注如何从交互式开始进行分词，所以说我们只会研究\cmd{loadline}的运行方
+式。
 
 \begin{ccode}{lua.c::doREPL}{\cmd{lua.c}中的\cmd{doREPL}函数}
 /*
@@ -138,5 +142,7 @@ static void doREPL (lua_State *L) {
   progname = oldprogname;
 }
 \end{ccode}
+
+\subsection{\cmd{loadline}函数}
 
 
