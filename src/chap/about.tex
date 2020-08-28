@@ -1,0 +1,47 @@
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{序}
+
+这是一本关于\cmd{lua}如何实现的文章。本书的源代码可以访问托管在\cmd{github}上的
+仓库，即\cmd{github.com/PeterlitsZo/lua\_source\_code\_note\_cn}。
+
+\section{本书读者}
+
+我们希望读者有着较强的\cmd{C}语言使用经验，对基本的计算机术语有着基础的认识（\emph{%
+如：状态机，面向对象等}）。如果不熟悉的话，推荐阅读《C和指针》或者《The C Programming
+Language》。
+
+此外重要的一点是了解编译原理，当然，如果读者之前完全没有尝试了解编译原理的，我也
+会尽量在探讨\cmd{lua}语言的时候讲得通俗易懂。
+
+本书不要求读者会使用\cmd{lua}。我们的目的是寻找如何实现一门编程语言的具体示例。
+
+我们希望读者使用过UNIX shell的经历。
+
+\section{为什么是\cmd{lua}}
+
+\cmd{lua}是一个简洁、轻量、对\cmd{C}友好的脚本语言。它的实现非常优雅，是一个有着
+属于它独特魅力的语言。
+
+\section{\cmd{lua}版本}
+
+本书采用的\cmd{lua}是正在开发中的版本，你可以在\cmd{github.com}中运行命令进行克隆：
+\begin{code}{about[clone-lua]}{在\cmd{github.com}克隆到本地}
+$ git clone github.com/lua/lua.git ~/lua
+$ cd ~/lua
+$ git reset --hard 6bc0f135
+\end{code}
+
+运行了相关的shell代码\ref{about[clone-lua]}，我们可以说你现在看到的\cmd{lua}代码
+和编写本书时看到的\cmd{lua}代码基本一致。
+
+本书的目的并非\cmd{lua}代码是如何实现的（\emph{但是也正如所示，我们的的确确会探讨
+\cmd{lua}是如何实现的}），我们关注的重点更是如何从零开始打造一个图灵完备的编程语言。
+这也是我们为什么不强求\cmd{lua}的实现版本，我们关注的是一个语言如何从零实现的。
+
+\section{致谢}
+
+本书有很多部分都是基于源代码、维基百科和\cmd{lua}的官方网站\footnote{见：\cmd{lua.prg}%
+。}，在这里对开源组织表示感谢。
+
