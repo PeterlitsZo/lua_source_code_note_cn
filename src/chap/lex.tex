@@ -11,7 +11,20 @@
 \section{命令行解析}
 
 我们在了解如何分词之前我们需要了解它到底在什么时候开始分词的。在一开始我们跟着
-调用顺序从\cmd{main}入手，随后是\cmd{pmain}。
+调用顺序从\cmd{main}入手，随后是\cmd{pmain}，等等，如示意图\ref{lex.tex[0]}。
+
+\begin{code}{lex.tex[0]}{示意图：从\cmd{main}到\cmd{lex}}
+main
+ +- 加载全局状态机
+ +- 运行 cfunction: pmain
+ |   +- 解析命令行参数
+ |   +- 如果是有其他情况...
+ |   +- 如果是 -i 或者无参数运行：
+ |       +- 运行 doREPL，进入循环。
+ |           +- 使用 loadline 来读取输入
+ |           +- 使用 docall 来进行运行。
+ +- 结束状态机运行
+\end{code}
 
 \subsection{\cmd{main}入口}
 
@@ -145,4 +158,25 @@ static void doREPL (lua_State *L) {
 
 \subsection{\cmd{loadline}函数}
 
+如代码\ref{lua.c::loadline}所示，我们首先会使用\cmd{pushline}来输入解析。
+
+\begin{ccode}{lua.c::loadline}{\cmd{lua.c}中的\cmd{loadline}函数}
+/*
+** read a line and try to load (compile) it first as an expression (by
+** adding "return " in front of it) and second as a statement. return
+** the final status of load/call with the resulting function (if any)
+** in the top of the stack.
+*/
+static int loadline (lua_state *l) {
+  int status;
+  lua_settop(l, 0);
+  if (!pushline(l, 1))
+    return -1;  /* no input */
+  if ((status = addreturn(l)) != lua_ok)  /* 'return ...' did not work? */
+    status = multiline(l);  /* try as command, maybe with continuation lines */
+  lua_remove(l, 1);  /* remove line from the stack */
+  lua_assert(lua_gettop(l) == 1);
+  return status;
+}
+\end{ccode}
 
