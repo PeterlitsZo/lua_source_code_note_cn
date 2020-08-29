@@ -19,11 +19,14 @@ main
  +- 加载全局状态机
  +- 运行 cfunction: pmain
  |   +- 解析命令行参数
+ |   +- 如果是 -i 或者无参数运行
+ |   |   +- 运行 doREPL，进入循环
+ |   |       +- 使用 loadline 来读取输入并编译
+ |   |       |   +- 将一行入栈
+ |   |       |   +- 如果是值的话，尝试添加 return 将值返回
+ |   |       |   +- 如果不是值的话，尝试读取多行
+ |   |       +- 使用 docall 来进行运行
  |   +- 如果是有其他情况...
- |   +- 如果是 -i 或者无参数运行：
- |       +- 运行 doREPL，进入循环。
- |           +- 使用 loadline 来读取输入
- |           +- 使用 docall 来进行运行。
  +- 结束状态机运行
 \end{code}
 
@@ -166,7 +169,7 @@ static void doREPL (lua_State *L) {
 结构，即\cmd{loadline}函数。
 
 
-\subsection{\cmd{loadline}函数和进入解析的入口\cmd{pushline}}
+\subsection{\cmd{loadline}函数和进入解析的入口\cmd{pushline}、\cmd{multiline}与\cmd{addreturn}}
 
 如代码\ref{lua.c::loadline}所示，我们首先会使用\cmd{pushline}来输入解析。
 
@@ -192,7 +195,15 @@ static int loadline (lua_state *l) {
 }
 \end{ccode}
 
-而\cmd{pushline}，如代码\ref{lua.c::pushline}所示，我们
+而\cmd{pushline}，如代码\ref{lua.c::pushline}所示，我们先通过\cmd{lua\_readline}
+来读取数据到\cmd{buffer}，如果没有读取到数据的话，那么\cmd{b}就被赋值为\cmd{NULL}。
+
+[TODO]: 根据 `Readline` 的定义，如果没有输入的话（比如一个 `EOF`）就会返回一个
+`NULL`，但是如果有的话，就需要动态地从堆中搞一个 `char*`，最后释放即可。那用
+`buffer`声明一个比较大的栈空间有什么作用呢？
+[ANSWER]: 如果没有 `LUA\_USE\_READLINE` 的话，那我们就需要这个栈空间了，如果有的话就
+不需要了。
+[TODO]: 那么定义一个 `INIT\_BUFFER` 会不会更 nice 一些呢？
 
 \begin{ccode}{lua.c::pushline}{\cmd{lua.c}中\cmd{REPL}的IO动作与语法解析}
 /*
@@ -219,4 +230,61 @@ static int pushline (lua_State *L, int firstline) {
 }
 \end{ccode}
 
+之后我们尝试将内存中的行加上\cmd{return}，定义为代码\ref{lua.c::addreturn}。我们
+注意到\cmd{status}由\cmd{luaL\_loadbuffer}返回，而\cmd{status}的值正好指明了时候
+编译成功，我们接下来将进入\cmd{luaL\_loadbuffer}的源代码。
 
+\begin{ccode}{lua.c::addreturn}
+/*
+** Try to compile line on the stack as 'return <line>;'; on return, stack
+** has either compiled chunk or original line (if compilation failed).
+*/
+static int addreturn (lua_State *L) {
+  const char *line = lua_toString(L, -1); /* original line */
+  const char *retline = lua_pushfstring(L, "return %s;", line);
+  int status = luaL_loadbuffer(L, retline, strlen(retline), "=stdin");
+  if (status = LUA_OK) {
+    lua_remove(L, -2); /* remove modified line */
+    if (line[0] != '\0') /* non empty */
+      lua_saveline(L, line);  /* keep history */
+  }
+  else
+    lua_pop(L, 2);  /* pop result from 'luaL_loadbuffer' and modified line */
+  return status;
+}
+\end{ccode}
+
+
+\subsection{进入解析：\cmd{luaL\_loadbuffer}函数}
+
+经过解析，函数\cmd{luaL\_loadbuffer}的底层就是位于文件\cmd{lapi.c}的函数\cmd
+{lua\_load}，我们在代码\ref{lapi.c::lua_load}中可以很明显的看到：我们会调用
+函数\cmd{luaD\_protectedparser}来进行解析。
+
+\begin{ccode}{lapi.c::lua_load}{在\cmd{lapi.c}中的函数\cmd{lua_load}}
+LUA_API int lua_load (lua_State *L, lua_Reader reader, void *data,
+                      const char *chunkname, const char *mode) {
+  ZIO z;
+  int status;
+  lua_lock(L);
+  if (!chunkname) chunkname = "?";
+  luaZ_init(L, &z, reader, data);
+  status = luaD_protectedparser(L, &z, chunkname, mode);
+  if (status == LUA_OK) {  /* no errors? */
+    LClosure *f = clLvalue(s2v(L->top - 1));  /* get newly created function */
+    if (f->nupvalues >= 1) {  /* does it have an upvalue? */
+      /* get global table from registry */
+      Table *reg = hvalue(&G(L)->l_registry);
+      const TValue *gt = luaH_getint(reg, LUA_RIDX_GLOBALS);
+      /* set global table as 1st upvalue of 'f' (may be LUA_ENV) */
+      setobj(L, f->upvals[0]->v, gt);
+      luaC_barrier(L, f->upvals[0], gt);
+    }
+  }
+  lua_unlock(L);
+  return status;
+}
+\end{ccode}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
